@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Kocholingo"/>
+<meta name="theme-color" content="#7c3aed"/>
+<link rel="manifest" href="manifest.json"/>
+<title>Kocholingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --purple:    #7c3aed;
+  --purple2:   #9d5cf0;
+  --purple3:   #c084fc;
+  --teal:      #0d9488;
+  --teal2:     #14b8a6;
+  --yellow:    #f59e0b;
+  --yellow2:   #fbbf24;
+  --red:       #ef4444;
+  --red2:      #f87171;
+  --green:     #22c55e;
+  --green2:    #4ade80;
+  --blue:      #3b82f6;
+  --orange:    #f97316;
+  --pink:      #ec4899;
+
+  --bg:        #faf5ff;
+  --bg2:       #f3e8ff;
+  --card:      #ffffff;
+  --text:      #1e1b4b;
+  --muted:     #6b7280;
+  --muted2:    #d1d5db;
+  --border:    #e9d5ff;
+
+  --tabh: 68px;
+  --st: env(safe-area-inset-top, 44px);
+  --sb: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); }
+body { font-family: 'Nunito', sans-serif; color: var(--text); overscroll-behavior: none; }
+
+/* ===== BG ===== */
+.bg {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(124,58,237,.08), transparent 50%),
+    radial-gradient(ellipse at 90% 10%, rgba(236,72,153,.06), transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgba(13,148,136,.06), transparent 50%),
+    #faf5ff;
+}
+
+/* ===== APP ===== */
+#app { height: 100%; display: flex; flex-direction: column; }
+.st-bar { height: var(--st); min-height: 44px; flex-shrink: 0; }
+.scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.pad { height: calc(var(--tabh) + var(--sb) + 12px); }
+.page { display: none; }
+.page.active { display: block; animation: fadeUp .2s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  flex-shrink: 0; padding: 0 20px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.app-logo { display: flex; align-items: center; gap: 8px; }
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; box-shadow: 0 3px 12px rgba(124,58,237,.3);
+}
+.logo-name {
+  font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.topbar-stats { display: flex; align-items: center; gap: 10px; }
+.stat-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 100px; padding: 5px 12px;
+  font-size: .8rem; font-weight: 800; color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+.stat-pill.xp { border-color: rgba(245,158,11,.3); color: var(--yellow); }
+.stat-pill.hearts { border-color: rgba(239,68,68,.3); color: var(--red); }
+.stat-pill.streak { border-color: rgba(249,115,22,.3); color: var(--orange); }
+
+/* ===== HOME ===== */
+.home-hero {
+  margin: 0 20px 20px;
+  background: linear-gradient(135deg, var(--purple), #5b21b6);
+  border-radius: 24px; padding: 24px 20px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(124,58,237,.3);
+}
+.home-hero::after {
+  content: '🦜'; position: absolute; right: 16px; bottom: -8px;
+  font-size: 5rem; opacity: .2; pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+  border-radius: 100px; padding: 4px 12px;
+  font-size: .62rem; font-weight: 800; color: rgba(255,255,255,.9);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px;
+}
+.hero-title {
+  font-family: 'Baloo 2', cursive; font-size: 1.7rem; font-weight: 800;
+  color: #fff; line-height: 1.15; margin-bottom: 6px;
+}
+.hero-sub { font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.65); margin-bottom: 18px; }
+.hero-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; color: var(--purple);
+  padding: 11px 22px; border-radius: 100px;
+  font-family: 'Nunito', sans-serif; font-size: .85rem; font-weight: 900;
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  transition: transform .15s;
+}
+.hero-btn:active { transform: scale(.95); }
+
+/* Progress bar */
+.progress-wrap { margin: 0 20px 20px; }
+.progress-label { display: flex; justify-content: space-between; font-size: .75rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.progress-bar { background: var(--muted2); border-radius: 100px; height: 10px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--purple), var(--pink)); transition: width .6s cubic-bezier(.34,1.56,.64,1); }
+
+/* Section */
+.sec-head { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-bottom: 12px; }
+.sec-title { font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.sec-link { font-size: .75rem; font-weight: 800; color: var(--purple); background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; }
+
+/* Lesson cards */
+.lessons-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 4px; scrollbar-width: none; }
+.lessons-scroll::-webkit-scrollbar { display: none; }
+.lesson-card {
+  flex-shrink: 0; width: 140px;
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 20px; padding: 16px 14px;
+  cursor: pointer; transition: transform .15s, box-shadow .15s;
+  position: relative; overflow: hidden;
+  box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+.lesson-card:active { transform: scale(.95); }
+.lesson-card.done { border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.04); }
+.lesson-card.locked { opacity: .5; pointer-events: none; }
+.lesson-card.current { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,.15), 0 3px 16px rgba(124,58,237,.2); }
+.lc-emoji { font-size: 2rem; margin-bottom: 10px; display: block; }
+.lc-name { font-size: .78rem; font-weight: 800; color: var(--text); margin-bottom: 4px; line-height: 1.25; }
+.lc-sub { font-size: .65rem; font-weight: 600; color: var(--muted); }
+.lc-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: .6rem; font-weight: 900; padding: 2px 7px; border-radius: 100px;
+}
+.badge-done { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+.badge-new { background: rgba(124,58,237,.12); color: var(--purple); border: 1px solid rgba(124,58,237,.25); }
+.badge-lock { background: rgba(107,114,128,.1); color: var(--muted); }
+
+/* Quick vocab */
+.vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; margin-bottom: 20px; }
+.vocab-card {
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 16px; padding: 14px;
+  cursor: pointer; transition: transform .12s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.vocab-card:active { transform: scale(.95); }
+.vc-kochol { font-family: 'Baloo 2', cursive; font-size: 1.05rem; font-weight: 700; color: var(--purple); margin-bottom: 3px; }
+.vc-fr { font-size: .75rem; font-weight: 700; color: var(--muted); }
+.vc-pron { font-size: .65rem; font-weight: 600; color: var(--muted2); font-style: italic; margin-top: 2px; }
+
+/* ===== LEÇON (exercice) ===== */
+.lesson-page { padding: 0; }
+.lesson-topbar {
+  padding: var(--st) 20px 14px; padding-top: calc(var(--st) + 4px);
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg); position: sticky; top: 0; z-index: 10;
+  border-bottom: 2px solid var(--border);
+}
+.lesson-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(107,114,128,.1); border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; cursor: pointer; flex-shrink: 0;
+  transition: background .15s;
+}
+.lesson-close:active { background: rgba(239,68,68,.15); }
+.lesson-progress-bar { flex: 1; background: var(--muted2); border-radius: 100px; height: 10px; overflow: hidden; }
+.lesson-progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--purple), var(--pink)); transition: width .4s cubic-bezier(.34,1.56,.64,1); }
+.lesson-hearts { display: flex; gap: 3px; flex-shrink: 0; }
+.heart { font-size: 1.1rem; transition: transform .2s; }
+.heart.lost { opacity: .25; transform: scale(.85); }
+
+.lesson-body { padding: 24px 20px; }
+.exercise-type {
+  font-size: .65rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--purple); margin-bottom: 8px;
+}
+.exercise-question {
+  font-family: 'Baloo 2', cursive; font-size: 1.4rem; font-weight: 700;
+  color: var(--text); line-height: 1.3; margin-bottom: 8px;
+}
+.exercise-hint { font-size: .78rem; font-weight: 600; color: var(--muted); margin-bottom: 28px; }
+
+/* Character display */
+.char-display {
+  background: linear-gradient(135deg, var(--purple), #5b21b6);
+  border-radius: 20px; padding: 28px; text-align: center; margin-bottom: 28px;
+  box-shadow: 0 6px 24px rgba(124,58,237,.3);
+}
+.char-big { font-family: 'Baloo 2', cursive; font-size: 4rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 8px; }
+.char-pron { font-size: .85rem; font-weight: 700; color: rgba(255,255,255,.7); letter-spacing: .04em; }
+
+/* Options */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option-btn {
+  width: 100%; padding: 16px 18px;
+  background: var(--card); border: 2.5px solid var(--border);
+  border-radius: 16px; text-align: left;
+  font-family: 'Nunito', sans-serif; font-size: .92rem; font-weight: 700;
+  color: var(--text); cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color .15s, background .15s, transform .12s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.option-btn:active { transform: scale(.98); }
+.option-btn.selected { border-color: var(--purple); background: rgba(124,58,237,.06); }
+.option-btn.correct { border-color: var(--green); background: rgba(34,197,94,.08); color: var(--green); }
+.option-btn.wrong { border-color: var(--red); background: rgba(239,68,68,.07); color: var(--red); }
+.opt-letter {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  background: var(--bg2); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 900; color: var(--muted);
+}
+.option-btn.selected .opt-letter { background: var(--purple); border-color: var(--purple); color: #fff; }
+.option-btn.correct .opt-letter { background: var(--green); border-color: var(--green); color: #fff; }
+.option-btn.wrong .opt-letter { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* Word bank */
+.word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.word-chip {
+  padding: 8px 14px; border-radius: 10px;
+  background: var(--card); border: 2px solid var(--border);
+  font-family: 'Nunito', sans-serif; font-size: .85rem; font-weight: 700;
+  color: var(--text); cursor: pointer;
+  transition: transform .12s, border-color .15s;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+.word-chip:active { transform: scale(.93); }
+.word-chip.used { opacity: .3; pointer-events: none; }
+.word-chip.selected { border-color: var(--purple); background: rgba(124,58,237,.08); color: var(--purple); }
+
+.answer-zone {
+  min-height: 52px; border: 2.5px dashed var(--border);
+  border-radius: 14px; padding: 10px 14px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 8px; background: rgba(124,58,237,.03);
+  cursor: pointer;
+}
+.answer-zone-label { font-size: .72rem; font-weight: 700; color: var(--muted2); }
+.answer-chip {
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--purple); color: #fff;
+  font-size: .82rem; font-weight: 800;
+  cursor: pointer; transition: transform .12s;
+}
+.answer-chip:active { transform: scale(.9); }
+
+/* Footer validate */
+.lesson-footer {
+  position: fixed; left: 0; right: 0;
+  bottom: calc(var(--sb)); padding: 14px 20px;
+  background: var(--bg); border-top: 2px solid var(--border);
+  z-index: 10;
+}
+.validate-btn {
+  width: 100%; padding: 16px;
+  border-radius: 16px; border: none;
+  font-family: 'Nunito', sans-serif; font-size: .95rem; font-weight: 900;
+  cursor: pointer; transition: transform .15s, opacity .15s;
+  letter-spacing: .02em;
+}
+.validate-btn.inactive { background: var(--muted2); color: #fff; pointer-events: none; }
+.validate-btn.active { background: linear-gradient(135deg, var(--purple), #5b21b6); color: #fff; box-shadow: 0 4px 20px rgba(124,58,237,.35); }
+.validate-btn.active:active { transform: scale(.98); }
+.validate-btn.next { background: linear-gradient(135deg, var(--teal), var(--teal2)); box-shadow: 0 4px 20px rgba(13,148,136,.3); }
+
+/* Feedback overlay */
+.feedback {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  padding: 20px 20px calc(20px + var(--sb));
+  z-index: 20; transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.32,.72,0,1);
+  border-radius: 24px 24px 0 0;
+}
+.feedback.show { transform: translateY(0); }
+.feedback.correct-fb { background: rgba(34,197,94,.12); border-top: 3px solid var(--green); }
+.feedback.wrong-fb { background: rgba(239,68,68,.08); border-top: 3px solid var(--red); }
+.fb-icon { font-size: 2rem; margin-bottom: 6px; }
+.fb-title { font-family: 'Baloo 2', cursive; font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
+.feedback.correct-fb .fb-title { color: var(--green); }
+.feedback.wrong-fb .fb-title { color: var(--red); }
+.fb-sub { font-size: .8rem; font-weight: 600; color: var(--muted); margin-bottom: 14px; }
+.fb-btn {
+  width: 100%; padding: 14px; border-radius: 14px; border: none;
+  font-family: 'Nunito', sans-serif; font-size: .9rem; font-weight: 900;
+  cursor: pointer; transition: transform .15s;
+}
+.feedback.correct-fb .fb-btn { background: var(--green); color: #fff; box-shadow: 0 4px 16px rgba(34,197,94,.3); }
+.feedback.wrong-fb .fb-btn { background: var(--red); color: #fff; box-shadow: 0 4px 16px rgba(239,68,68,.25); }
+.fb-btn:active { transform: scale(.97); }
+
+/* ===== DICTIONNAIRE ===== */
+.dict-search-wrap { padding: 0 20px 14px; position: relative; }
+.dict-search {
+  width: 100%; padding: 13px 18px 13px 44px;
+  border-radius: 16px; border: 2px solid var(--border);
+  background: var(--card); font-family: 'Nunito', sans-serif;
+  font-size: .9rem; font-weight: 700; color: var(--text); outline: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+.dict-search::placeholder { color: var(--muted2); }
+.dict-search-icon { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); font-size: .95rem; }
+.dict-filters { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 14px; scrollbar-width: none; }
+.dict-filters::-webkit-scrollbar { display: none; }
+.df-pill {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 100px;
+  font-size: .72rem; font-weight: 800; background: var(--card);
+  border: 2px solid var(--border); color: var(--text); cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.df-pill.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+.dict-list { padding: 0 20px; display: flex; flex-direction: column; gap: 9px; }
+.dict-item {
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 16px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: border-color .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.dict-item:active { border-color: var(--purple); }
+.di-emoji { font-size: 1.5rem; flex-shrink: 0; width: 40px; text-align: center; }
+.di-info { flex: 1; }
+.di-kochol { font-family: 'Baloo 2', cursive; font-size: 1rem; font-weight: 700; color: var(--purple); margin-bottom: 1px; }
+.di-fr { font-size: .8rem; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+.di-pron { font-size: .68rem; font-weight: 600; color: var(--muted); font-style: italic; }
+.di-cat {
+  font-size: .6rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 100px; flex-shrink: 0;
+}
+.cat-base { background: rgba(124,58,237,.1); color: var(--purple); border: 1px solid rgba(124,58,237,.2); }
+.cat-num { background: rgba(245,158,11,.1); color: var(--yellow); border: 1px solid rgba(245,158,11,.2); }
+.cat-verb { background: rgba(13,148,136,.1); color: var(--teal); border: 1px solid rgba(13,148,136,.2); }
+.cat-jour { background: rgba(59,130,246,.1); color: var(--blue); border: 1px solid rgba(59,130,246,.2); }
+.cat-expr { background: rgba(236,72,153,.1); color: var(--pink); border: 1px solid rgba(236,72,153,.2); }
+
+/* ===== PROFIL ===== */
+.profile-wrap { padding: 0 20px; }
+.profile-hero {
+  background: linear-gradient(135deg, var(--purple), #5b21b6);
+  border-radius: 24px; padding: 24px 20px; margin-bottom: 18px; text-align: center;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(124,58,237,.25);
+}
+.profile-hero::after { content: '🦜'; position: absolute; right: 12px; bottom: -10px; font-size: 5rem; opacity: .15; }
+.ph-av {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,.2); border: 3px solid rgba(255,255,255,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; margin: 0 auto 12px;
+}
+.ph-name { font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.ph-level { font-size: .75rem; font-weight: 700; color: rgba(255,255,255,.65); margin-bottom: 16px; }
+.ph-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.ph-stat { background: rgba(255,255,255,.12); border-radius: 14px; padding: 10px; text-align: center; }
+.ph-stat-n { font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800; color: #fff; line-height: 1; }
+.ph-stat-l { font-size: .6rem; font-weight: 700; color: rgba(255,255,255,.55); margin-top: 2px; }
+
+.achiev-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
+.achiev {
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 16px; padding: 14px 10px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.achiev-icon { font-size: 1.8rem; margin-bottom: 6px; display: block; }
+.achiev-name { font-size: .65rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+.achiev-sub { font-size: .58rem; font-weight: 600; color: var(--muted); }
+.achiev.locked { opacity: .4; }
+
+/* Streak calendar */
+.streak-card {
+  background: linear-gradient(135deg, #ff6b35, var(--orange));
+  border-radius: 20px; padding: 18px; margin-bottom: 18px;
+  box-shadow: 0 6px 24px rgba(249,115,22,.25);
+}
+.streak-title { font-family: 'Baloo 2', cursive; font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.streak-num { font-family: 'Baloo 2', cursive; font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 4px; }
+.streak-sub { font-size: .72rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: 14px; }
+.streak-days { display: flex; gap: 6px; }
+.sd {
+  flex: 1; aspect-ratio: 1; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .58rem; font-weight: 800; color: rgba(255,255,255,.5);
+}
+.sd.done { background: rgba(255,255,255,.25); color: #fff; }
+.sd.today { background: #fff; color: var(--orange); }
+
+/* ===== TAB BAR ===== */
+.tabbar {
+  flex-shrink: 0; background: rgba(255,255,255,.92);
+  backdrop-filter: blur(20px); border-top: 2px solid var(--border);
+  display: flex; padding-bottom: var(--sb);
+  box-shadow: 0 -4px 20px rgba(124,58,237,.08);
+}
+.tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 10px 0 8px;
+  border: none; background: none; font-family: 'Nunito', sans-serif;
+  cursor: pointer; gap: 3px; position: relative;
+}
+.tab-icon { font-size: 1.25rem; transition: transform .2s cubic-bezier(.34,1.56,.64,1); }
+.tab-label { font-size: .58rem; font-weight: 800; color: var(--muted); letter-spacing: .02em; transition: color .15s; }
+.tab.active .tab-label { color: var(--purple); }
+.tab.active .tab-icon { transform: scale(1.15); }
+.tab-dot {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 3px; border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, var(--purple), var(--pink));
+  opacity: 0; transition: opacity .2s;
+}
+.tab.active .tab-dot { opacity: 1; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: calc(var(--tabh) + var(--sb) + 14px);
+  left: 50%; transform: translateX(-50%) translateY(14px);
+  background: var(--text); color: #fff;
+  border-radius: 100px; padding: 10px 20px;
+  font-size: .78rem; font-weight: 700; white-space: nowrap;
+  opacity: 0; pointer-events: none; z-index: 500;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s;
+  box-shadow: 0 6px 24px rgba(0,0,0,.2);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ===== COMPLETE SCREEN ===== */
+.complete-screen {
+  position: fixed; inset: 0; z-index: 100;
+  background: linear-gradient(135deg, var(--purple), #5b21b6);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 28px; text-align: center;
+}
+.complete-screen.show { display: flex; animation: fadeUp .3s ease; }
+.cs-icon { font-size: 5rem; margin-bottom: 16px; animation: bounce 1s ease infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.cs-title { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.cs-sub { font-size: .88rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: 32px; }
+.cs-stats { display: flex; gap: 16px; margin-bottom: 32px; }
+.cs-stat { background: rgba(255,255,255,.15); border-radius: 16px; padding: 16px 20px; text-align: center; }
+.cs-stat-n { font-family: 'Baloo 2', cursive; font-size: 1.8rem; font-weight: 800; color: #fff; }
+.cs-stat-l { font-size: .7rem; font-weight: 700; color: rgba(255,255,255,.6); }
+.cs-btn {
+  width: 100%; padding: 16px; border-radius: 16px; border: none;
+  background: #fff; color: var(--purple);
+  font-family: 'Nunito', sans-serif; font-size: .95rem; font-weight: 900;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  transition: transform .15s;
+}
+.cs-btn:active { transform: scale(.97); }
+
+.mt { margin-top: 18px; }
+.mb { margin-bottom: 18px; }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="toast" id="toast"></div>
+
+<!-- COMPLETE SCREEN -->
+<div class="complete-screen" id="completeScreen">
+  <div class="cs-icon">🎉</div>
+  <div class="cs-title">Leçon terminée !</div>
+  <div class="cs-sub">Excellent travail, tu progresses en Kochol !</div>
+  <div class="cs-stats">
+    <div class="cs-stat"><div class="cs-stat-n" id="cs-xp">+20</div><div class="cs-stat-l">XP gagnés</div></div>
+    <div class="cs-stat"><div class="cs-stat-n" id="cs-acc">100%</div><div class="cs-stat-l">Précision</div></div>
+  </div>
+  <button class="cs-btn" onclick="finishLesson()">Continuer →</button>
+</div>
+
+<!-- FEEDBACK -->
+<div class="feedback" id="feedback">
+  <div class="fb-icon" id="fb-icon"></div>
+  <div class="fb-title" id="fb-title"></div>
+  <div class="fb-sub" id="fb-sub"></div>
+  <button class="fb-btn" id="fb-btn" onclick="nextExercise()">Continuer</button>
+</div>
+
+<div id="app">
+  <div class="st-bar"></div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="app-logo">
+      <div class="logo-icon">🦜</div>
+      <div class="logo-name">Kocholingo</div>
+    </div>
+    <div class="topbar-stats">
+      <div class="stat-pill streak">🔥 <span id="streak-num">3</span></div>
+      <div class="stat-pill xp">⚡ <span id="xp-num">140</span></div>
+      <div class="stat-pill hearts">❤️ <span id="hearts-num">5</span></div>
+    </div>
+  </div>
+
+  <div class="scroll" id="scrollEl">
+
+    <!-- ═══ HOME ═══ -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <div class="hero-tag">🇰🇴 Langue Kochol</div>
+        <div class="hero-title">Apprends le<br/>Kochol !</div>
+        <div class="hero-sub">La langue du Royaume du Kochako en leçons courtes et fun 🎮</div>
+        <button class="hero-btn" onclick="startLesson(0)">▶ Continuer ma leçon</button>
+      </div>
+
+      <!-- Progression -->
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>🎯 Progression globale</span>
+          <span id="prog-pct">35%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-bar" style="width:35%"></div></div>
+      </div>
+
+      <!-- Leçons -->
+      <div class="sec-head">
+        <div class="sec-title">📚 Mes leçons</div>
+        <button class="sec-link">Voir tout</button>
+      </div>
+      <div class="lessons-scroll mb">
+        <div class="lesson-card done" onclick="startLesson(0)">
+          <span class="lc-emoji">👋</span>
+          <div class="lc-name">Les bases</div>
+          <div class="lc-sub">Salutations</div>
+          <div class="lc-badge badge-done">✓ OK</div>
+        </div>
+        <div class="lesson-card current" onclick="startLesson(1)">
+          <span class="lc-emoji">🔢</span>
+          <div class="lc-name">Les chiffres</div>
+          <div class="lc-sub">0 à 10</div>
+          <div class="lc-badge badge-new">En cours</div>
+        </div>
+        <div class="lesson-card" onclick="startLesson(2)">
+          <span class="lc-emoji">📅</span>
+          <div class="lc-name">Les jours</div>
+          <div class="lc-sub">Diasde Yemanja</div>
+          <div class="lc-badge badge-new">Nouveau</div>
+        </div>
+        <div class="lesson-card locked">
+          <span class="lc-emoji">🏃</span>
+          <div class="lc-name">Les verbes</div>
+          <div class="lc-sub">Conjugaison</div>
+          <div class="lc-badge badge-lock">🔒</div>
+        </div>
+        <div class="lesson-card locked">
+          <span class="lc-emoji">🏙️</span>
+          <div class="lc-name">Les villes</div>
+          <div class="lc-sub">Géographie</div>
+          <div class="lc-badge badge-lock">🔒</div>
+        </div>
+      </div>
+
+      <!-- Vocab du jour -->
+      <div class="sec-head">
+        <div class="sec-title">✨ Vocabulaire du jour</div>
+        <button class="sec-link" onclick="switchTab('dico')">Tout →</button>
+      </div>
+      <div class="vocab-grid mb">
+        <div class="vocab-card" onclick="toast('🔊 Ë — [yo]')">
+          <div class="vc-kochol">Ë</div>
+          <div class="vc-fr">Salut !</div>
+          <div class="vc-pron">[yo]</div>
+        </div>
+        <div class="vocab-card" onclick="toast('🔊 Gratël — [gra-tel]')">
+          <div class="vc-kochol">Gratël</div>
+          <div class="vc-fr">Merci</div>
+          <div class="vc-pron">[gra-tel]</div>
+        </div>
+        <div class="vocab-card" onclick="toast('🔊 Ëw — [yow]')">
+          <div class="vc-kochol">Ëw</div>
+          <div class="vc-fr">Oui</div>
+          <div class="vc-pron">[yow]</div>
+        </div>
+        <div class="vocab-card" onclick="toast('🔊 Neja — [ne-ya]')">
+          <div class="vc-kochol">Neja</div>
+          <div class="vc-fr">Non</div>
+          <div class="vc-pron">[ne-ya]</div>
+        </div>
+      </div>
+      <div class="pad"></div>
+    </div>
+
+    <!-- ═══ LEÇON ═══ -->
+    <div class="page lesson-page" id="page-lesson">
+      <div class="lesson-topbar">
+        <button class="lesson-close" onclick="closeLesson()">✕</button>
+        <div class="lesson-progress-bar">
+          <div class="lesson-progress-fill" id="lesson-prog" style="width:0%"></div>
+        </div>
+        <div class="lesson-hearts" id="lesson-hearts">
+          <span class="heart">❤️</span>
+          <span class="heart">❤️</span>
+          <span class="heart">❤️</span>
+        </div>
+      </div>
+      <div class="lesson-body" id="lesson-body"></div>
+      <div style="height:120px"></div>
+      <div class="lesson-footer">
+        <button class="validate-btn inactive" id="validate-btn" onclick="validate()">Valider</button>
+      </div>
+    </div>
+
+    <!-- ═══ DICTIONNAIRE ═══ -->
+    <div class="page" id="page-dico">
+      <div style="padding:16px 20px 0">
+        <div class="sec-title mb">📖 Dictionnaire Kochol</div>
+      </div>
+      <div class="dict-search-wrap">
+        <span class="dict-search-icon">🔍</span>
+        <input class="dict-search" id="dictSearch" placeholder="Chercher un mot…" oninput="filterDict(this.value)"/>
+      </div>
+      <div class="dict-filters">
+        <div class="df-pill active" onclick="setDictCat('all',this)">Tout</div>
+        <div class="df-pill" onclick="setDictCat('base',this)">Bases</div>
+        <div class="df-pill" onclick="setDictCat('verb',this)">Verbes</div>
+        <div class="df-pill" onclick="setDictCat('num',this)">Chiffres</div>
+        <div class="df-pill" onclick="setDictCat('jour',this)">Jours</div>
+        <div class="df-pill" onclick="setDictCat('expr',this)">Expressions</div>
+      </div>
+      <div class="dict-list" id="dict-list"></div>
+      <div class="pad"></div>
+    </div>
+
+    <!-- ═══ PROFIL ═══ -->
+    <div class="page" id="page-profile">
+      <div class="profile-wrap">
+        <div class="profile-hero">
+          <div class="ph-av">🦜</div>
+          <div class="ph-name">Apprenant Kochol</div>
+          <div class="ph-level">⚡ Niveau 3 · Intermédiaire débutant</div>
+          <div class="ph-stats">
+            <div class="ph-stat"><div class="ph-stat-n" id="p-xp">140</div><div class="ph-stat-l">XP total</div></div>
+            <div class="ph-stat"><div class="ph-stat-n">2</div><div class="ph-stat-l">Leçons</div></div>
+            <div class="ph-stat"><div class="ph-stat-n" id="p-streak">3</div><div class="ph-stat-l">Jours 🔥</div></div>
+          </div>
+        </div>
+
+        <div class="streak-card mb">
+          <div class="streak-title">🔥 Série en cours</div>
+          <div class="streak-num" id="streak-big">3</div>
+          <div class="streak-sub">jours consécutifs — continue comme ça !</div>
+          <div class="streak-days">
+            <div class="sd done">L</div>
+            <div class="sd done">M</div>
+            <div class="sd done">M</div>
+            <div class="sd today">J</div>
+            <div class="sd">V</div>
+            <div class="sd">S</div>
+            <div class="sd">D</div>
+          </div>
+        </div>
+
+        <div class="sec-title mb">🏆 Succès</div>
+        <div class="achiev-grid">
+          <div class="achiev"><span class="achiev-icon">🌟</span><div class="achiev-name">Première leçon</div><div class="achiev-sub">Débloqué !</div></div>
+          <div class="achiev"><span class="achiev-icon">🔥</span><div class="achiev-name">3 jours de suite</div><div class="achiev-sub">Débloqué !</div></div>
+          <div class="achiev"><span class="achiev-icon">📖</span><div class="achiev-name">10 mots appris</div><div class="achiev-sub">Débloqué !</div></div>
+          <div class="achiev locked"><span class="achiev-icon">🔒</span><div class="achiev-name">7 jours de suite</div><div class="achiev-sub">En cours…</div></div>
+          <div class="achiev locked"><span class="achiev-icon">🔒</span><div class="achiev-name">50 mots appris</div><div class="achiev-sub">En cours…</div></div>
+          <div class="achiev locked"><span class="achiev-icon">🔒</span><div class="achiev-name">Expert Kochol</div><div class="achiev-sub">Bientôt…</div></div>
+        </div>
+        <div class="pad"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <button class="tab active" id="tab-home" onclick="switchTab('home')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">Accueil</span>
+    </button>
+    <button class="tab" id="tab-dico" onclick="switchTab('dico')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">📖</span>
+      <span class="tab-label">Dico</span>
+    </button>
+    <button class="tab" id="tab-profile" onclick="switchTab('profile')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">Profil</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const DICT = [
+  // Bases
+  {k:"Ë",fr:"Salut !",pron:"yo",cat:"base",emoji:"👋"},
+  {k:"Ëw",fr:"Oui",pron:"yow",cat:"base",emoji:"✅"},
+  {k:"Neja",fr:"Non",pron:"ne-ya",cat:"base",emoji:"❌"},
+  {k:"Gratël",fr:"Merci",pron:"gra-tel",cat:"base",emoji:"🙏"},
+  {k:"Ëfavori",fr:"S'il te plaît",pron:"yo-fa-vo-ri",cat:"base",emoji:"🤲"},
+  {k:"Me",fr:"Je / Moi",pron:"me",cat:"base",emoji:"👤"},
+  {k:"Te",fr:"Tu / Toi",pron:"te",cat:"base",emoji:"👥"},
+  {k:"Eo",fr:"Il",pron:"e-o",cat:"base",emoji:"🧑"},
+  {k:"Ea",fr:"Elle",pron:"e-a",cat:"base",emoji:"👩"},
+  {k:"Nos",fr:"Nous",pron:"nos",cat:"base",emoji:"👫"},
+  // Verbes
+  {k:"Amacer",fr:"Aimer",pron:"a-ma-ser",cat:"verb",emoji:"❤️"},
+  {k:"Vacecer",fr:"Aller",pron:"va-se-ser",cat:"verb",emoji:"🚶"},
+  {k:"Parlecer",fr:"Parler",pron:"par-le-ser",cat:"verb",emoji:"💬"},
+  {k:"Manjecer",fr:"Manger",pron:"man-je-ser",cat:"verb",emoji:"🍽️"},
+  {k:"Dormicer",fr:"Dormir",pron:"dor-mi-ser",cat:"verb",emoji:"😴"},
+  // Chiffres
+  {k:"Čero",fr:"Zéro (0)",pron:"tche-ro",cat:"num",emoji:"0️⃣"},
+  {k:"Ouni",fr:"Un (1)",pron:"ou-ni",cat:"num",emoji:"1️⃣"},
+  {k:"Due",fr:"Deux (2)",pron:"dou-e",cat:"num",emoji:"2️⃣"},
+  {k:"Tre",fr:"Trois (3)",pron:"tre",cat:"num",emoji:"3️⃣"},
+  {k:"Čuatri",fr:"Quatre (4)",pron:"tchoua-tri",cat:"num",emoji:"4️⃣"},
+  {k:"Kink",fr:"Cinq (5)",pron:"kink",cat:"num",emoji:"5️⃣"},
+  {k:"Six",fr:"Six (6)",pron:"six",cat:"num",emoji:"6️⃣"},
+  {k:"Septi",fr:"Sept (7)",pron:"sep-ti",cat:"num",emoji:"7️⃣"},
+  {k:"Octo",fr:"Huit (8)",pron:"ok-to",cat:"num",emoji:"8️⃣"},
+  {k:"Novial",fr:"Neuf (9)",pron:"no-vial",cat:"num",emoji:"9️⃣"},
+  {k:"Dixi",fr:"Dix (10)",pron:"dik-si",cat:"num",emoji:"🔟"},
+  // Jours
+  {k:"Mordaki",fr:"Lundi",pron:"mor-da-ki",cat:"jour",emoji:"📅"},
+  {k:"Marsoki",fr:"Mardi",pron:"mar-so-ki",cat:"jour",emoji:"📅"},
+  {k:"Merkuriki",fr:"Mercredi",pron:"mer-ku-ri-ki",cat:"jour",emoji:"📅"},
+  {k:"Jupiki",fr:"Jeudi",pron:"jou-pi-ki",cat:"jour",emoji:"📅"},
+  {k:"Venuki",fr:"Vendredi",pron:"ve-nou-ki",cat:"jour",emoji:"📅"},
+  {k:"Saturki",fr:"Samedi",pron:"sa-tur-ki",cat:"jour",emoji:"📅"},
+  {k:"Soliki",fr:"Dimanche",pron:"so-li-ki",cat:"jour",emoji:"📅"},
+  // Expressions
+  {k:"Me ama te",fr:"Je t'aime",pron:"me a-ma te",cat:"expr",emoji:"❤️"},
+  {k:"Aljardia",fr:"Aujourd'hui",pron:"al-yar-di-a",cat:"expr",emoji:"📆"},
+  {k:"Malëxiktič",fr:"Malédiction",pron:"ma-lyo-xik-titch",cat:"expr",emoji:"👁️"},
+  {k:"Rejalič",fr:"Royal(e)",pron:"re-ya-litch",cat:"expr",emoji:"👑"},
+];
+
+// ===== EXERCISES =====
+const LESSONS = [
+  // Leçon 0 — Les bases
+  [
+    {type:"qcm", q:"Que signifie « Ë » en Kochol ?", hint:"C'est la première chose à dire !", char:"Ë",
+      options:["Merci","Au revoir","Salut !","S'il te plaît"], answer:2},
+    {type:"qcm", q:"Comment dit-on « Merci » en Kochol ?", hint:"Ça ressemble à un prénom…",
+      options:["Neja","Gratël","Ëw","Ëfavori"], answer:1},
+    {type:"qcm", q:"Que signifie « Neja » ?", hint:"La négation en Kochol", char:"Neja",
+      options:["Oui","Peut-être","Non","Bonjour"], answer:2},
+    {type:"qcm", q:"Comment dit-on « Oui » en Kochol ?",
+      options:["Ëfavori","Neja","Gratël","Ëw"], answer:3},
+    {type:"qcm", q:"Que signifie « Me ama te » ?", hint:"Une phrase très connue…",
+      options:["Je m'appelle Martin","Comment tu t'appelles ?","Je t'aime","Merci beaucoup"], answer:2},
+  ],
+  // Leçon 1 — Les chiffres
+  [
+    {type:"qcm", q:"Comment dit-on « 1 » en Kochol ?", char:"1",
+      options:["Čero","Due","Ouni","Kink"], answer:2},
+    {type:"qcm", q:"Que vaut « Kink » ?", char:"Kink",
+      options:["3","5","7","9"], answer:1},
+    {type:"qcm", q:"Comment dit-on « 0 » en Kochol ?", char:"0",
+      options:["Čero","Novial","Dixi","Ouni"], answer:0},
+    {type:"qcm", q:"Que signifie « Octo » ?", char:"Octo",
+      options:["6","7","8","9"], answer:2},
+    {type:"qcm", q:"Comment dit-on « 10 » en Kochol ?", char:"10",
+      options:["Septi","Dixi","Novial","Čuatri"], answer:1},
+  ],
+  // Leçon 2 — Les jours
+  [
+    {type:"qcm", q:"Quel jour est « Mordaki » ?", char:"Mordaki",
+      options:["Mardi","Mercredi","Lundi","Jeudi"], answer:2},
+    {type:"qcm", q:"Comment dit-on « Vendredi » en Kochol ?",
+      options:["Saturki","Marsoki","Jupiki","Venuki"], answer:3},
+    {type:"qcm", q:"Que signifie « Soliki » ?", char:"Soliki",
+      options:["Samedi","Dimanche","Vendredi","Lundi"], answer:1},
+    {type:"qcm", q:"Quel jour est « Jupiki » ?", char:"Jupiki",
+      options:["Mardi","Mercredi","Jeudi","Vendredi"], answer:2},
+    {type:"qcm", q:"Comment dit-on « aujourd'hui » en Kochol ?",
+      options:["Mordaki","Aljardia","Soliki","Rejalič"], answer:1},
+  ],
+];
+
+// ===== STATE =====
+let xp = 140, hearts = 3, streak = 3;
+let currentLesson = 0, currentEx = 0, selected = null, answered = false;
+let wrongCount = 0, lessonHearts = 3;
+let dictCat = 'all';
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('scrollEl').scrollTop = 0;
+  if(tab==='dico') renderDict(dictCat,'');
+}
+
+// ===== LESSON =====
+function startLesson(idx) {
+  currentLesson = idx;
+  currentEx = 0;
+  selected = null;
+  answered = false;
+  lessonHearts = 3;
+  wrongCount = 0;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-lesson').classList.add('active');
+  document.getElementById('tab-home').classList.remove('active');
+  renderExercise();
+  updateLessonUI();
+}
+
+function closeLesson() {
+  hideFeedback();
+  switchTab('home');
+}
+
+function updateLessonUI() {
+  const total = LESSONS[currentLesson].length;
+  const pct = (currentEx / total) * 100;
+  document.getElementById('lesson-prog').style.width = pct + '%';
+  const hearts = document.getElementById('lesson-hearts');
+  hearts.innerHTML = '';
+  for(let i=0;i<3;i++){
+    hearts.innerHTML += `<span class="heart${i>=lessonHearts?' lost':''}">❤️</span>`;
+  }
+}
+
+function renderExercise() {
+  const ex = LESSONS[currentLesson][currentEx];
+  selected = null; answered = false;
+  document.getElementById('validate-btn').className = 'validate-btn inactive';
+  hideFeedback();
+
+  let html = `<div class="exercise-type">// Exercice ${currentEx+1} sur ${LESSONS[currentLesson].length}</div>`;
+  html += `<div class="exercise-question">${ex.q}</div>`;
+  if(ex.hint) html += `<div class="exercise-hint">💡 ${ex.hint}</div>`;
+
+  if(ex.char) {
+    html += `<div class="char-display"><div class="char-big">${ex.char}</div></div>`;
+  }
+
+  if(ex.type === 'qcm') {
+    html += `<div class="options">`;
+    const letters = ['A','B','C','D'];
+    ex.options.forEach((opt,i) => {
+      html += `<button class="option-btn" id="opt-${i}" onclick="selectOption(${i})">
+        <div class="opt-letter">${letters[i]}</div>
+        <span>${opt}</span>
+      </button>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('lesson-body').innerHTML = html;
+}
+
+function selectOption(idx) {
+  if(answered) return;
+  selected = idx;
+  document.querySelectorAll('.option-btn').forEach((b,i) => {
+    b.classList.toggle('selected', i===idx);
+  });
+  const btn = document.getElementById('validate-btn');
+  btn.className = 'validate-btn active';
+  btn.textContent = 'Valider';
+}
+
+function validate() {
+  if(selected===null || answered) return;
+  answered = true;
+  const ex = LESSONS[currentLesson][currentEx];
+  const correct = selected === ex.answer;
+
+  document.querySelectorAll('.option-btn').forEach((b,i) => {
+    if(i===ex.answer) b.classList.add('correct');
+    else if(i===selected && !correct) b.classList.add('wrong');
+  });
+
+  if(correct) {
+    showFeedback(true, '🎉 Correct !', `"${ex.options[ex.answer]}" — bien joué !`);
+    xp += 10;
+    document.getElementById('xp-num').textContent = xp;
+    document.getElementById('p-xp').textContent = xp;
+  } else {
+    showFeedback(false, '😅 Pas tout à fait…', `La bonne réponse était : "${ex.options[ex.answer]}"`);
+    lessonHearts--;
+    wrongCount++;
+    updateLessonUI();
+  }
+
+  document.getElementById('validate-btn').className = 'validate-btn next';
+  document.getElementById('validate-btn').textContent = 'Continuer →';
+}
+
+function nextExercise() {
+  hideFeedback();
+  currentEx++;
+  if(currentEx >= LESSONS[currentLesson].length) {
+    showComplete();
+  } else {
+    renderExercise();
+    updateLessonUI();
+  }
+}
+
+function showFeedback(correct, title, sub) {
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct?'correct-fb':'wrong-fb');
+  document.getElementById('fb-icon').textContent = correct?'🎉':'😅';
+  document.getElementById('fb-title').textContent = title;
+  document.getElementById('fb-sub').textContent = sub;
+}
+
+function hideFeedback() {
+  document.getElementById('feedback').className = 'feedback';
+}
+
+function showComplete() {
+  const acc = Math.round(((LESSONS[currentLesson].length - wrongCount) / LESSONS[currentLesson].length)*100);
+  const gained = (LESSONS[currentLesson].length - wrongCount) * 10;
+  document.getElementById('cs-xp').textContent = '+'+gained;
+  document.getElementById('cs-acc').textContent = acc+'%';
+  document.getElementById('completeScreen').classList.add('show');
+}
+
+function finishLesson() {
+  document.getElementById('completeScreen').classList.remove('show');
+  hideFeedback();
+  switchTab('home');
+}
+
+// ===== DICTIONNAIRE =====
+function renderDict(cat, search) {
+  let items = DICT;
+  if(cat!=='all') items = items.filter(i=>i.cat===cat);
+  if(search) items = items.filter(i=>
+    i.k.toLowerCase().includes(search.toLowerCase()) ||
+    i.fr.toLowerCase().includes(search.toLowerCase())
+  );
+  const catLabels = {base:'Bases',verb:'Verbe',num:'Chiffre',jour:'Jour',expr:'Expression'};
+  const catClass = {base:'cat-base',verb:'cat-verb',num:'cat-num',jour:'cat-jour',expr:'cat-expr'};
+  document.getElementById('dict-list').innerHTML = items.map(w=>`
+    <div class="dict-item" onclick="toast('🔊 ${w.k} = ${w.fr} · [${w.pron}]')">
+      <div class="di-emoji">${w.emoji}</div>
+      <div class="di-info">
+        <div class="di-kochol">${w.k}</div>
+        <div class="di-fr">${w.fr}</div>
+        <div class="di-pron">[${w.pron}]</div>
+      </div>
+      <div class="di-cat ${catClass[w.cat]}">${catLabels[w.cat]}</div>
+    </div>
+  `).join('');
+}
+
+function setDictCat(cat, el) {
+  dictCat = cat;
+  document.querySelectorAll('.df-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderDict(cat, document.getElementById('dictSearch').value);
+}
+
+function filterDict(val) {
+  renderDict(dictCat, val);
+}
+
+// ===== TOAST =====
+let _tto;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tto);
+  _tto = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// ===== INIT =====
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+renderDict('all','');
+</script>
+</body>
+</html>
